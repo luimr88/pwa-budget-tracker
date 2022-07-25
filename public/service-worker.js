@@ -1,7 +1,7 @@
 const CACHE_NAME = 'my-site-cache-v2';
-const DATA_CACHE_NAME = 'data-cache-v2';
+const DATA_CACHE_NAME = 'offline-data-cache-v2';
 
-
+// Files that will stored in the cache
 const FILES_TO_CACHE = [
     '/',
     "/index.html",
@@ -19,6 +19,7 @@ const FILES_TO_CACHE = [
     "/manifest.json"
 ];
 
+// Install the service worker
 self.addEventListener('install', function (evt) {
     evt.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
@@ -29,6 +30,7 @@ self.addEventListener('install', function (evt) {
     self.skipWaiting();
 });
 
+// Initialize service worker and delete old data from the cache
 self.addEventListener('activate', function (evt) {
     evt.waitUntil(
         caches.keys().then(keyList => {
@@ -45,6 +47,7 @@ self.addEventListener('activate', function (evt) {
     self.clients.claim();
 });
 
+// Intercept fetch requests
 self.addEventListener('fetch', function (evt) {
     if (evt.request.url.includes('/api/')) {
         evt.respondWith(
@@ -65,7 +68,6 @@ self.addEventListener('fetch', function (evt) {
                 })
                 .catch(err => console.log(err))
         );
-
         return;
     }
 

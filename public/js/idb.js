@@ -2,11 +2,13 @@ let db;
 
 const request = indexedDB.open('budget_tracker', 1);
 
+// set up connection to IndexedDB database called 'budget_tracker'
 request.onupgradeneeded = function(event) {
     const db = event.target.result;
     db.createObjectStore('new_transaction', { autoIncrement: true });
 };
 
+// checks if the app is online, if it is it will run run uploadTracker()
 request.onsuccess = function (event) {
     db = event.target.result;
 
@@ -15,10 +17,12 @@ request.onsuccess = function (event) {
     }
 };
 
+// console logs error code
 request.onerror = function (event) {
     console.log(event.target.errorCode);
 };
 
+// This function will run if we try to submit a new transaction and there's no internet connection
 function saveRecord(record) {
     const transaction = db.transaction(['new_transaction'], 'readwrite');
 
@@ -27,6 +31,7 @@ function saveRecord(record) {
     dataObjectStore.add(record);
 };
 
+// Function that collects data from "new_transaction" object store and POST it to the server
 function uploadTracker() {
     const transaction = db.transaction(['new_transaction'], 'readwrite');
 
@@ -63,4 +68,5 @@ function uploadTracker() {
     };
 }
 
+// Window event listener that for the application regains internet connection
 window.addEventListener('online', uploadTracker);
